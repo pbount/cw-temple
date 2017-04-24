@@ -2,8 +2,13 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
+import game.NodeStatus;
+
+
+import java.util.*;
 
 public class Explorer {
+
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -36,7 +41,9 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    //TODO:
+    while(state.getDistanceToTarget() > 0){
+      state.moveTo(closestNeighbourToOrb(state.getNeighbours(), state));
+    }
   }
 
   /**
@@ -65,4 +72,21 @@ public class Explorer {
   public void escape(EscapeState state) {
     //TODO: Escape from the cavern before time runs out
   }
+
+  /**
+   *
+   * @param neighbours  Receives a collection of all available neighbours
+   * @param state       Receives the current state
+   * @return            returns the nearest location to the orb including the current location)
+   */
+  public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
+    long result = state.getCurrentLocation();
+    for (NodeStatus neighbour : neighbours){
+      if (neighbour.getDistanceToTarget() < state.getDistanceToTarget()){
+        result = neighbour.getId();
+      }
+    }
+    return result;
+  }
+
 }
