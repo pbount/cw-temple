@@ -9,5 +9,5 @@ public interface Constants {
   int ERROR_HEIGHT = 150;
   double INFO_SIZE = 0.5;    //How much of the screen should the info make up?
 
-  String ROOT = "/Users/keith/Courses/PiJ/coursework/cw-temple/code/src/images/";
+  String ROOT = "res/";
 }
