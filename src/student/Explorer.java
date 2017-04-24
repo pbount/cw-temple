@@ -9,6 +9,13 @@ import java.util.*;
 
 public class Explorer {
 
+  // the list of all blocks visited
+  private ArrayList<int[]> breadcrumTrail = new ArrayList();
+
+  // a breadcrum for every block
+  private int[] breadcrum = new int[2];
+
+
 
   /**
    * Explore the cavern, trying to find the orb in as few steps as possible.
@@ -77,10 +84,10 @@ public class Explorer {
    *
    * @param neighbours  Receives a collection of all available neighbours
    * @param state       Receives the current state
-   * @return            returns the nearest location to the orb including the current location)
+   * @return            returns the nearest location to the orb excluding the current location)
    */
   public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
-    long result = state.getCurrentLocation();
+    long result = neighbours.iterator().next().getId();
     for (NodeStatus neighbour : neighbours){
       if (neighbour.getDistanceToTarget() < state.getDistanceToTarget()){
         result = neighbour.getId();
@@ -88,5 +95,19 @@ public class Explorer {
     }
     return result;
   }
+  
+
+  public int breadcrumFinder(int id){
+    int result = 0;
+    if (breadcrumTrail.size() > 0) {
+      for (int[] current : breadcrumTrail) {
+        if (current[0] == id) {
+          result = current[1];
+        }
+      }
+    }
+    return result;
+  }
+
 
 }
