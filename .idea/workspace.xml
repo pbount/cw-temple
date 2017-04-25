@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6e67106e-28d0-4ff4-979e-fa5f8afabea2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/student/Explorer.java" afterPath="$PROJECT_DIR$/src/student/Explorer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -19,8 +18,8 @@
       <file leaf-file-name="Explorer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/student/Explorer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="97" column="2" lean-forward="false" selection-start-line="97" selection-start-column="2" selection-end-line="97" selection-end-column="2" />
+            <state relative-caret-position="277">
+              <caret line="52" column="50" lean-forward="false" selection-start-line="52" selection-start-column="50" selection-end-line="52" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -718,12 +717,12 @@
       <option name="presentableId" value="Default" />
       <updated>1493061650369</updated>
       <workItem from="1493061652211" duration="6064000" />
-      <workItem from="1493074980901" duration="2260000" />
+      <workItem from="1493074980901" duration="5184000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="8324000" />
+    <option name="totallyTimeSpent" value="11248000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="32" width="1382" height="744" extended-state="6" />
@@ -850,8 +849,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/student/Explorer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="97" column="2" lean-forward="false" selection-start-line="97" selection-start-column="2" selection-end-line="97" selection-end-column="2" />
+        <state relative-caret-position="277">
+          <caret line="52" column="50" lean-forward="false" selection-start-line="52" selection-start-column="50" selection-end-line="52" selection-end-column="50" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

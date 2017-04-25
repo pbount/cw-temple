@@ -10,10 +10,10 @@ import java.util.*;
 public class Explorer {
 
   // the list of all blocks visited
-  private ArrayList<int[]> breadcrumTrail = new ArrayList();
+  private ArrayList<long[]> breadcrumTrail = new ArrayList();
 
   // a breadcrum for every block
-  private int[] breadcrum = new int[2];
+  private long[] breadcrum = new long[2];
 
 
 
@@ -50,6 +50,7 @@ public class Explorer {
   public void explore(ExplorationState state) {
     while(state.getDistanceToTarget() > 0){
       state.moveTo(closestNeighbourToOrb(state.getNeighbours(), state));
+      breadcrumSetter(state.getCurrentLocation());
     }
   }
 
@@ -89,20 +90,43 @@ public class Explorer {
   public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
     long result = neighbours.iterator().next().getId();
     for (NodeStatus neighbour : neighbours){
-      if (neighbour.getDistanceToTarget() < state.getDistanceToTarget()){
+      System.out.println("the current neighbour is:" + neighbour.getId() + " and it's link is: " + neighbour + "and it was visited:" + breadcrumCounter(neighbour.getId()));
+      if (neighbour.getDistanceToTarget() < state.getDistanceToTarget() && breadcrumCounter(neighbour.getId())==0){
+        result = neighbour.getId();
+      }else if(breadcrumCounter(result) > breadcrumCounter(neighbour.getId())){
         result = neighbour.getId();
       }
     }
     return result;
   }
-  
 
-  public int breadcrumFinder(int id){
-    int result = 0;
+  public void breadcrumSetter(long id){
+    if (breadcrumGetter(id)[0] == 0){
+      long[] add = {id, 1};
+      breadcrumTrail.add(add);
+    }else{
+      breadcrumGetter(id)[1]++;
+    }
+  }
+
+  public long breadcrumCounter(long id){
+    long result = 0;
     if (breadcrumTrail.size() > 0) {
-      for (int[] current : breadcrumTrail) {
+      for (long[] current : breadcrumTrail) {
         if (current[0] == id) {
-          result = current[1];
+          return current[1];
+        }
+      }
+    }
+    return result;
+  }
+
+  public long[] breadcrumGetter(long id){
+    long result[] = {0,0};
+    if (breadcrumTrail.size() > 0) {
+      for (long[] current : breadcrumTrail) {
+        if (current[0] == id) {
+          return current;
         }
       }
     }
