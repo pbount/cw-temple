@@ -4,7 +4,6 @@ import game.EscapeState;
 import game.ExplorationState;
 import game.NodeStatus;
 import game.Node;
-import game.Tile;
 
 
 
@@ -12,15 +11,8 @@ import java.util.*;
 
 public class Explorer {
 
-  // the list of all blocks visited
   private ArrayList<long[]> breadcrumTrail = new ArrayList();
 
-  // a breadcrum for every block
-  private long[] breadcrum = new long[2];
-
-  // exit strategy
-
-  //ArrayList<ArrayList<Node>> steps = new ArrayList<>();
   ArrayList<Set<Node>> stepMap = new ArrayList<>();
   ArrayList<Node> finalPath = new ArrayList<>();
   Set<Node> scanned = new HashSet<>();
@@ -89,14 +81,7 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-    // Arraylist<Set<Node>> = stepMap
-    // ArrayList<Node>      = finalPath
-    // Set<Node>            = scanned
-
-
-
     Set<Node> potentialSteps = new HashSet<>();
-    Set<Node> uniqueSteps = new HashSet<>();
     Set<Node> lastEntry = new HashSet<>();
 
     potentialSteps.add(state.getCurrentNode());
@@ -136,9 +121,11 @@ public class Explorer {
 
     for(Node n : finalPath){
       state.moveTo(n);
+      if(state.getCurrentNode().getTile().getGold() > 0) {
+        state.pickUpGold();
+      }
     }
 
-    System.out.println("Steps to exit : " + finalPath );
 
   }
 
