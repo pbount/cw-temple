@@ -19,7 +19,10 @@ public class Explorer {
   private long[] breadcrum = new long[2];
 
   // exit strategy
-  ArrayList<ArrayList<Node>> steps = new ArrayList<>();
+
+  //ArrayList<ArrayList<Node>> steps = new ArrayList<>();
+  ArrayList<Set<Node>> stepMap = new ArrayList<>();
+  ArrayList<Node> finalPath = new ArrayList<>();
   Set<Node> scanned = new HashSet<>();
 
 
@@ -86,88 +89,57 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
+    // Arraylist<Set<Node>> = stepMap
+    // ArrayList<Node>      = finalPath
+    // Set<Node>            = scanned
 
-    Set<Node> currentNodes = new HashSet<>();
-    ArrayList<Node> step = new ArrayList<>();
-    currentNodes = state.getCurrentNode().getNeighbours();
-    scanned.addAll(currentNodes);
-    step.addAll(currentNodes);
-    steps.add(step);
-    do{
-      Set<Node> temp = getLastStepElements();
-      //System.out.println("The size of temp is: " + temp.size());
-      step.clear();
-      step = getUniqueNeighbourList(getLastStepElements());
-      steps.add(step);
-      scanned.addAll(step);
-      System.out.println("size of last: " + getLastStepElements().size());
-      System.out.println("scannedsize: " + scanned.size());
+
+
+    Set<Node> potentialSteps = new HashSet<>();
+    Set<Node> uniqueSteps = new HashSet<>();
+    Set<Node> lastEntry = new HashSet<>();
+
+    potentialSteps.add(state.getCurrentNode());
+    stepMap.add(potentialSteps);
+    scanned.addAll(potentialSteps);
+
+    do {
+      potentialSteps = new HashSet<>();
+      lastEntry = getLastStep();
+      for (Node n : lastEntry) {
+        potentialSteps.addAll(getUniqueNeighbours(n));
+        scanned.addAll(getUniqueNeighbours(n));
+      }
+      stepMap.add(potentialSteps);
     }while(!scanned.contains(state.getExit()));
 
 
 
+    Collections.reverse(stepMap);
+    Node nextStep = state.getExit();
+    finalPath.add(nextStep);
 
+    System.out.println("Stepmap : " + stepMap.toString());
+    System.out.println("Beginning: " + state.getCurrentNode());
+    System.out.println("End: " + state.getExit());
 
-
-
-
-    /**
-    ArrayList<Node> neighbours = new ArrayList<>();
-    ArrayList<Node> layer = new ArrayList<>();
-    Set<Node> currentNodes = new HashSet<>();
-
-    currentNodes = getNodeNeighbours(state.getCurrentNode());
-    layer.addAll(currentNodes);
-    layers.add(layer);
-
-    while (!layers.contains(state.getExit())){
-      ArrayList<Node> newLayer = new ArrayList<>();
-      for (Node n : layer){
-        newLayer.addAll(getUniqueNeighbours(getNodeNeighbours(n)));
-      }
-      layers.add(newLayer);
-      layer = newLayer;
-      newLayer.clear();
-      System.out.println("the size of the final is: " + layers.size());
-    }
-
-    System.out.println("The last block is found. Distance: " + layers.size());
-    */
-
-
-
-    /**
-    boolean exitfound = false;
-    Node exitNode = state.getExit();
-    ArrayList<ArrayList<Node>> levels = new ArrayList<>();
-    ArrayList<Node> neighbours = new ArrayList<>();
-    neighbours.addAll(state.getCurrentNode().getNeighbours());
-    levels.add(neighbours);
-    int step = 0;
-
-    while (!exitfound){
-      ArrayList<Node> temp = new ArrayList<>();
-      ArrayList<Node> toAdd = new ArrayList<>();
-      neighbours = null;
-
-      for (Node n : temp){
-        toAdd.addAll(state.getCurrentNode().getNeighbours());
-        for (Node x : toAdd){
-          if (!levels.contains(x)){
-            neighbours.add(x);
-          }
-        }
-
-        if (neighbours.contains(exitNode)){
-          exitfound = true;
+    for (int i = 1; i < stepMap.size()-1; i++){
+      for(Node n : stepMap.get(i)){
+        if (nextStep.getNeighbours().contains(n)){
+          nextStep = n;
+          finalPath.add(n);
         }
       }
-
     }
 
-    System.out.println("steps so far: "+ step);
+    Collections.reverse(finalPath);
 
-     */
+    for(Node n : finalPath){
+      state.moveTo(n);
+    }
+
+    System.out.println("Steps to exit : " + finalPath );
+
   }
 
 
@@ -224,37 +196,21 @@ public class Explorer {
     return result;
   }
 
-  public Set<Node> getUniqueNeighbours(Set<Node> nodeCollection){
+  public Set<Node> getUniqueNeighbours(Node node){
     Set<Node> uniqueNodeCollection = new HashSet<>();
-    uniqueNodeCollection.clear();
 
-    for (Node n : nodeCollection){
-      for (Node nj : n.getNeighbours()){
-        if (!scanned.contains(nj)){
-          uniqueNodeCollection.add(nj);
-          scanned.add(nj);
+    for (Node n : node.getNeighbours()){
+        if (!scanned.contains(n)) {
+          uniqueNodeCollection.add(n);
         }
-      }
     }
-
     return uniqueNodeCollection;
   }
 
-  public ArrayList<Node> getUniqueNeighbourList(Set<Node> nodeCollection){
-        ArrayList<Node> uniqueNodeCollection = new ArrayList<>();
-        uniqueNodeCollection.addAll(getUniqueNeighbours(nodeCollection));
-        return uniqueNodeCollection;
-  }
 
-  public ArrayList<Node> getLastStep(){
-    ArrayList<Node> result = steps.get(steps.size() - 1);
+  public Set<Node> getLastStep(){
+    Set<Node> result = stepMap.get(stepMap.size() - 1);
     return result;
-  }
-
-  public Set<Node> getLastStepElements(){
-      Set<Node> result = new HashSet<>();
-      result.addAll(getLastStep());
-      return result;
   }
 
 }
