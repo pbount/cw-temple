@@ -2,21 +2,14 @@ package student;
 
 import game.EscapeState;
 import game.ExplorationState;
-import game.NodeStatus;
 import game.Node;
 
-
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class Explorer {
-
-  private ArrayList<long[]> breadcrumTrail = new ArrayList();
-
-  ArrayList<Set<Node>> stepMap = new ArrayList<>();
-  ArrayList<Node> finalPath = new ArrayList<>();
-  Set<Node> scanned = new HashSet<>();
-
+  ToolKit toolkit = new ToolKit();
 
 
   /**
@@ -50,10 +43,10 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void explore(ExplorationState state) {
-    breadcrumSetter(state.getCurrentLocation());
+    toolkit.breadcrumSetter(state.getCurrentLocation());
     while(state.getDistanceToTarget() > 0){
-      state.moveTo(closestNeighbourToOrb(state.getNeighbours(), state));
-      breadcrumSetter(state.getCurrentLocation());
+      state.moveTo(toolkit.closestNeighbourToOrb(state.getNeighbours(), state));
+      toolkit.breadcrumSetter(state.getCurrentLocation());
     }
   }
 
@@ -81,123 +74,24 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-    Set<Node> potentialSteps = new HashSet<>();
-    Set<Node> lastEntry = new HashSet<>();
 
-    potentialSteps.add(state.getCurrentNode());
-    stepMap.add(potentialSteps);
-    scanned.addAll(potentialSteps);
+    ArrayList<Node> finalPath;
 
-    do {
-      potentialSteps = new HashSet<>();
-      lastEntry = getLastStep();
-      for (Node n : lastEntry) {
-        potentialSteps.addAll(getUniqueNeighbours(n));
-        scanned.addAll(getUniqueNeighbours(n));
-      }
-      stepMap.add(potentialSteps);
-    }while(!scanned.contains(state.getExit()));
+    int starttime = state.getTimeRemaining();
 
-
-
-    Collections.reverse(stepMap);
-    Node nextStep = state.getExit();
-    finalPath.add(nextStep);
-
-    System.out.println("Stepmap : " + stepMap.toString());
-    System.out.println("Beginning: " + state.getCurrentNode());
-    System.out.println("End: " + state.getExit());
-
-    for (int i = 1; i < stepMap.size()-1; i++){
-      for(Node n : stepMap.get(i)){
-        if (nextStep.getNeighbours().contains(n)){
-          nextStep = n;
-          finalPath.add(n);
-        }
+    while(toolkit.timeLeftPercentage(starttime, state.getTimeRemaining()) > 50){
+      state.moveTo(toolkit.randomNode(state.getCurrentNode().getNeighbours()));
+      if(state.getCurrentNode().getTile().getGold() > 0) {
+        state.pickUpGold();
       }
     }
 
-    Collections.reverse(finalPath);
-
+    finalPath = toolkit.getShortestPathToExit(state.getCurrentNode(), state.getExit());
     for(Node n : finalPath){
       state.moveTo(n);
       if(state.getCurrentNode().getTile().getGold() > 0) {
         state.pickUpGold();
       }
     }
-
-
   }
-
-
-
-
-  /**
-   *
-   * @param neighbours  Receives a collection of all available neighbours
-   * @param state       Receives the current state
-   * @return            returns the nearest location to the orb excluding the current location)
-   */
-  public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
-    long result = neighbours.iterator().next().getId();
-    for (NodeStatus neighbour : neighbours){
-      if (neighbour.getDistanceToTarget() < state.getDistanceToTarget() && breadcrumCounter(neighbour.getId())==0){
-        result = neighbour.getId();
-      }else if(breadcrumCounter(result) > breadcrumCounter(neighbour.getId())){
-        result = neighbour.getId();
-      }
-    }
-    return result;
-  }
-
-  public void breadcrumSetter(long id){
-    if (breadcrumGetter(id)[0] == 0){
-      long[] add = {id, 1};
-      breadcrumTrail.add(add);
-    }else{
-      breadcrumGetter(id)[1]++;
-    }
-  }
-
-  public long breadcrumCounter(long id){
-    long result = 0;
-    if (breadcrumTrail.size() > 0) {
-      for (long[] current : breadcrumTrail) {
-        if (current[0] == id) {
-          return current[1];
-        }
-      }
-    }
-    return result;
-  }
-
-  public long[] breadcrumGetter(long id){
-    long result[] = {0,0};
-    if (breadcrumTrail.size() > 0) {
-      for (long[] current : breadcrumTrail) {
-        if (current[0] == id) {
-          return current;
-        }
-      }
-    }
-    return result;
-  }
-
-  public Set<Node> getUniqueNeighbours(Node node){
-    Set<Node> uniqueNodeCollection = new HashSet<>();
-
-    for (Node n : node.getNeighbours()){
-        if (!scanned.contains(n)) {
-          uniqueNodeCollection.add(n);
-        }
-    }
-    return uniqueNodeCollection;
-  }
-
-
-  public Set<Node> getLastStep(){
-    Set<Node> result = stepMap.get(stepMap.size() - 1);
-    return result;
-  }
-
 }
