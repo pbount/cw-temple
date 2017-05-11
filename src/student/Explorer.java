@@ -76,11 +76,17 @@ public class Explorer {
   public void escape(EscapeState state) {
 
     ArrayList<Node> finalPath;
-
     int starttime = state.getTimeRemaining();
+    toolkit.clearBreadcrumTrail();
 
     while(toolkit.timeLeftPercentage(starttime, state.getTimeRemaining()) > 50){
-      state.moveTo(toolkit.randomNode(state.getCurrentNode().getNeighbours()));
+      if(toolkit.getTileWithMostGold(state.getCurrentNode().getNeighbours()) != null) {
+        state.moveTo(toolkit.getTileWithMostGold(state.getCurrentNode().getNeighbours()));
+        toolkit.breadcrumSetter(state.getCurrentNode().getId());
+      }else {
+        state.moveTo(toolkit.randomNode(state.getCurrentNode().getNeighbours()));
+        toolkit.breadcrumSetter(state.getCurrentNode().getId());
+      }
       if(state.getCurrentNode().getTile().getGold() > 0) {
         state.pickUpGold();
       }

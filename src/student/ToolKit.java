@@ -127,11 +127,35 @@ public class ToolKit {
     }
 
     public Node randomNode(Set<Node> pickOne){
+        /**
         Random randomGenerator = new Random();
         ArrayList<Node> nodePool = new ArrayList<>();
         nodePool.addAll(pickOne);
         int index = randomGenerator.nextInt(nodePool.size());
         return nodePool.get(index);
+         */
+
+        Node result = pickOne.iterator().next();
+        for(Node n : pickOne){
+            if (breadcrumCounter(n.getId()) <= breadcrumCounter(result.getId())) {
+                result = n;
+            }
+        }
+        return result;
+    }
+
+    public Node getTileWithMostGold(Set<Node> pickOne){
+        Node result = pickOne.iterator().next();
+        for(Node n : pickOne){
+            if (n.getTile().getGold() > result.getTile().getGold()){
+                result = n;
+            }
+        }
+        return result;
+    }
+
+    public void clearBreadcrumTrail(){
+        breadcrumTrail.clear();
     }
 
 }
