@@ -3,7 +3,6 @@ package student;
 import game.ExplorationState;
 import game.Node;
 import game.NodeStatus;
-
 import java.util.*;
 
 /**
@@ -84,9 +83,12 @@ public class ToolKit {
         return result;
     }
 
-    public ArrayList<Node> getShortestPathToExit(Node start, Node exit){
+    public ArrayList<Node> getShortestPathToNode(Node start, Node exit){
         Set<Node> potentialSteps = new HashSet<>();
         Set<Node> lastEntry = new HashSet<>();
+        scanned.clear();
+        stepMap.clear();
+        finalPath.clear();
 
         potentialSteps.add(start);
         stepMap.add(potentialSteps);
@@ -157,5 +159,37 @@ public class ToolKit {
     public void clearBreadcrumTrail(){
         breadcrumTrail.clear();
     }
+
+    public ArrayList<Node> getMostGoldNodes(Collection<Node> allNodes){
+        ArrayList<Node> result = new ArrayList<Node>();
+        result.addAll(allNodes);
+
+        Collections.sort(result, new Comparator<Node>() {
+            @Override
+            public int compare(Node o1, Node o2) {
+                return o1.getTile().getGold() - o2.getTile().getGold();
+            }
+        });
+
+        Collections.reverse(result);
+        return result;
+    }
+
+    public Node nextClosestNodeWithGold(Node currentNode, ArrayList<Node> nodesWithGold){
+        Node result = nodesWithGold.get(0);
+        int currentDistance = getShortestPathToNode(currentNode, result).size();
+        int nextDistance;
+        for (Node n : nodesWithGold){
+            nextDistance = getShortestPathToNode(currentNode, n).size();
+            if (n.getTile().getGold() > 0 && currentDistance > nextDistance){
+                currentDistance = nextDistance;
+                result = n;
+            }
+        }
+        return result;
+
+    }
+
+
 
 }

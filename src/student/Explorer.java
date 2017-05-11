@@ -80,19 +80,17 @@ public class Explorer {
     toolkit.clearBreadcrumTrail();
 
     while(toolkit.timeLeftPercentage(starttime, state.getTimeRemaining()) > 50){
-      if(toolkit.getTileWithMostGold(state.getCurrentNode().getNeighbours()) != null) {
-        state.moveTo(toolkit.getTileWithMostGold(state.getCurrentNode().getNeighbours()));
-        toolkit.breadcrumSetter(state.getCurrentNode().getId());
-      }else {
-        state.moveTo(toolkit.randomNode(state.getCurrentNode().getNeighbours()));
-        toolkit.breadcrumSetter(state.getCurrentNode().getId());
-      }
-      if(state.getCurrentNode().getTile().getGold() > 0) {
-        state.pickUpGold();
+      Node closestGold = toolkit.nextClosestNodeWithGold(state.getCurrentNode(),toolkit.getMostGoldNodes(state.getVertices()));
+      finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), closestGold);
+      for (Node n : finalPath){
+        state.moveTo(n);
+        if(state.getCurrentNode().getTile().getGold() > 0) {
+          state.pickUpGold();
+        }
       }
     }
 
-    finalPath = toolkit.getShortestPathToExit(state.getCurrentNode(), state.getExit());
+    finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), state.getExit());
     for(Node n : finalPath){
       state.moveTo(n);
       if(state.getCurrentNode().getTile().getGold() > 0) {
