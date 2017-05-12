@@ -88,24 +88,39 @@ public class Explorer {
     int starttime = state.getTimeRemaining();
     toolkit.clearBreadcrumTrail();
 
+    /**
     while(toolkit.timeLeftPercentage(starttime, state.getTimeRemaining()) > 50){
       Node closestGold = toolkit.nextClosestNodeWithGold(state.getCurrentNode(),toolkit.sortAllNodesByGold(state.getVertices()));
       finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), closestGold);
       for (Node n : finalPath){
         state.moveTo(n);
-        System.out.println("Time: " + state.getTimeRemaining());
         if(state.getCurrentNode().getTile().getGold() > 0) {
           state.pickUpGold();
         }
       }
     }
+     */
 
+      if(state.getCurrentNode().getTile().getGold() > 0) {
+          state.pickUpGold();
+      }
+
+    // Search for gold. I still have time.
+    while(toolkit.enoughTimeToKeepSearching(state.getTimeRemaining(), state.getCurrentNode(), state.getExit())){
+        Node closestGold = toolkit.nextClosestNodeWithGold(state.getCurrentNode(),toolkit.sortAllNodesByGold(state.getVertices()));
+        finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), closestGold);
+        for (Node n : finalPath){
+            state.moveTo(n);
+            if(state.getCurrentNode().getTile().getGold() > 0) {
+                state.pickUpGold();
+            }
+        }
+    }
+
+    // run out! Touch nothing!
     finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), state.getExit());
     for(Node n : finalPath){
       state.moveTo(n);
-      if(state.getCurrentNode().getTile().getGold() > 0) {
-        state.pickUpGold();
-      }
     }
   }
 }

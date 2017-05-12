@@ -273,4 +273,10 @@ public class ToolKit {
         }
         return result;
     }
+
+    public boolean enoughTimeToKeepSearching(int time, Node current, Node exit){
+        int currentDistance = getShortestPathToNode(current, exit).size();
+        boolean result = (currentDistance * 11 < time) ? true : false;
+        return result;
+    }
 }
