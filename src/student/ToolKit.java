@@ -45,9 +45,9 @@ public class ToolKit {
     public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
         long result = neighbours.iterator().next().getId();
         for (NodeStatus neighbour : neighbours){
-            if (neighbour.getDistanceToTarget() < state.getDistanceToTarget() && breadcrumCounter(neighbour.getId())==0){
+            if (neighbour.getDistanceToTarget() < state.getDistanceToTarget() && breadcrumCounter(neighbour.getId())==0 && neighbour.getId() != 0){
                 result = neighbour.getId();
-            }else if(breadcrumCounter(result) > breadcrumCounter(neighbour.getId())){
+            }else if(breadcrumCounter(result) > breadcrumCounter(neighbour.getId()) && neighbour.getId() != 0){
                 result = neighbour.getId();
             }
         }
@@ -141,7 +141,7 @@ public class ToolKit {
      */
     public ArrayList<Node> getShortestPathToNode(Node start, Node exit){
         Set<Node> potentialSteps = new HashSet<>();
-        Set<Node> lastEntry = new HashSet<>();
+        Set<Node> lastEntry;
         scanned.clear();
         stepMap.clear();
         finalPath.clear();
@@ -274,9 +274,24 @@ public class ToolKit {
         return result;
     }
 
-    public boolean enoughTimeToKeepSearching(int time, Node current, Node exit){
+    /**
+     * Calculates the time to get to the exit, the time to get to the exit after visiting the
+     * closest node with gold and compares to current time. If the explorer can indeed
+     * reach the exit after visiting another node, he does so. Otherwise if the time
+     * won't suffice to visit another node to pickup gold he moves to the exit.
+     *
+     * @param time                  the time currently remaining.
+     * @param current               the current location of the explorer.
+     * @param closestTileWithGold   the location of the closest node with gold.
+     * @param exit                  the location of the exit.
+     * @return
+     */
+    public boolean enoughTimeToKeepSearching(int time, Node current, Node closestTileWithGold, Node exit){
         int currentDistance = getShortestPathToNode(current, exit).size();
-        boolean result = (currentDistance * 11 < time) ? true : false;
+        int distanceToGold = getShortestPathToNode(current, closestTileWithGold).size();
+        int distanceFromGoldToExit = getShortestPathToNode(closestTileWithGold, exit).size();
+        int totalDistance = (distanceToGold + distanceFromGoldToExit);
+        boolean result = (totalDistance * 10 < time) ? true : false;
         return result;
     }
 }
