@@ -5,8 +5,6 @@ import game.ExplorationState;
 import game.Node;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 public class Explorer {
   ToolKit toolkit = new ToolKit();
@@ -74,16 +72,28 @@ public class Explorer {
    * @param state the information available at the current state
    */
   public void escape(EscapeState state) {
-
+    /**
+         * The concept of finding the final path can be described as such:Knowing the first tile (using id),
+     * it is possible to find all of it's neighbours. Since all the neighbours are adjusent to the
+            * initial tile it is possible to reach those in one step. The collection of nodes reachable in one step are
+            *  the first layer of possible steps. Proceeding from there, it is possible to find the  neighbours of  all tiles
+            * in  the  first layer, ignoring duplicates, as some tiles may share a neighbour. This will be the second layer.
+     * Then find the third layer and so on. The final
+     * result will be a series of layers expanding from the initial tile, though all possible paths
+            * until the destination is found. Even though there may be numerous possible paths from beginning
+     * to destination, there is a single shortest path from destination to beginning. As long as the
+            * explorer steps on tiles which are in a layer smaller than the current one.
+    */
     ArrayList<Node> finalPath;
     int starttime = state.getTimeRemaining();
     toolkit.clearBreadcrumTrail();
 
     while(toolkit.timeLeftPercentage(starttime, state.getTimeRemaining()) > 50){
-      Node closestGold = toolkit.nextClosestNodeWithGold(state.getCurrentNode(),toolkit.getMostGoldNodes(state.getVertices()));
+      Node closestGold = toolkit.nextClosestNodeWithGold(state.getCurrentNode(),toolkit.sortAllNodesByGold(state.getVertices()));
       finalPath = toolkit.getShortestPathToNode(state.getCurrentNode(), closestGold);
       for (Node n : finalPath){
         state.moveTo(n);
+        System.out.println("Time: " + state.getTimeRemaining());
         if(state.getCurrentNode().getTile().getGold() > 0) {
           state.pickUpGold();
         }

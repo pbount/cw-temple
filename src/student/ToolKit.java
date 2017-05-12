@@ -10,6 +10,22 @@ import java.util.*;
  */
 public class ToolKit {
 
+    /**
+     * breadcrumTrail: In order for the explorer to know whether he visited the tile he is standing  on
+     *   he  leaves  a  breadcrum  on  every  new  and  visited tile. He can then chose a direction
+     *   containing the least breadcrums, until he reaches his goal.
+     *
+     * stepMap: The stepMap contains layers of possible steps, from a given location, to a destination.
+     *    From the perspective of the  starting point,  there may be more  than one paths. From the
+     *    perspective of the destination however, we can find the starting point by  stepping on
+     *    tiles, which are in a previous layer. The size  of the  stepMap  provides  us  with
+     *    the minimum number of steps as well.
+     *
+     * finalPath: following each step by layer, from the stepMap, we find a sequence of steps and store
+     *    those in the finalPath.
+     *
+     * scanned: required for finding unique neighbours
+     */
     private ArrayList<long[]> breadcrumTrail = new ArrayList();
 
     private ArrayList<Set<Node>> stepMap = new ArrayList<>();
@@ -17,9 +33,14 @@ public class ToolKit {
     private Set<Node> scanned = new HashSet<>();
     /**
      *
+     * Given the distance from the current location of the  explorer, as  well  as  how  many times the
+     * explorer has visited a tile, this method returns the nearest  neighbour of the current tile,
+     * closest to the orb.
+     *
      * @param neighbours  Receives a collection of all available neighbours
      * @param state       Receives the current state
-     * @return            returns the nearest location to the orb excluding the current location)
+     * @return            returns the nearest location to the orb excluding the current location
+     *                    (dependent on previous visits as well)
      */
     public long closestNeighbourToOrb(Collection<NodeStatus> neighbours, ExplorationState state){
         long result = neighbours.iterator().next().getId();
@@ -33,6 +54,10 @@ public class ToolKit {
         return result;
     }
 
+    /**
+     * Sets a breadcrum on a tile. If it already has a breadcrum, it increments the number.
+     * @param id    Receives the Id of the tile.
+     */
     public void breadcrumSetter(long id){
         if (breadcrumGetter(id)[0] == 0){
             long[] add = {id, 1};
@@ -42,6 +67,11 @@ public class ToolKit {
         }
     }
 
+    /**
+     * Counts how many breadcrums are placed on a tile.
+     * @param id    The Id of the tile.
+     * @return      The number of breadcrums found on the tile.
+     */
     public long breadcrumCounter(long id){
         long result = 0;
         if (breadcrumTrail.size() > 0) {
@@ -54,6 +84,13 @@ public class ToolKit {
         return result;
     }
 
+    /**
+     * Gets the object  itself,  containing  the  tile  Id and  the number of breadcrums. (Required for
+     * breadcrumSetter)
+     * @param id    The Id of the tile.
+     * @return      The object containing tile and breadcrum information.
+     * TODO: The naming could use some improvement
+     */
     public long[] breadcrumGetter(long id){
         long result[] = {0,0};
         if (breadcrumTrail.size() > 0) {
@@ -66,6 +103,12 @@ public class ToolKit {
         return result;
     }
 
+    /**
+     * Receives a Node and finds all  its  neighbours (if any) which have  not  been  added in the next
+     * layer of possible steps.
+     * @param node  Receives a Node.
+     * @return      Returns a collection of unique Nodes.
+     */
     public Set<Node> getUniqueNeighbours(Node node){
         Set<Node> uniqueNodeCollection = new HashSet<>();
 
@@ -77,12 +120,25 @@ public class ToolKit {
         return uniqueNodeCollection;
     }
 
-
+    /**
+     * Returns   the   last    possible layer  of steps  found. (This layer contains  the exit as well).
+     * Required as a starting point to transverse the  layers of steps in  reverse order and
+     * build the finalPath.
+     * @return      A set of Nodes containing the Exit.
+     */
     public Set<Node> getLastStep(){
         Set<Node> result = stepMap.get(stepMap.size() - 1);
         return result;
     }
 
+    /**
+     *  Returns an Arraylist of nodes (the shortest possible path) from start to end.
+     *
+     * @param start     The start node.
+     * @param exit      The end node.
+     * @return          Returns an ArrayList of neighbouring nodes from the start (excluding start) to the end
+     *                  (including the end).
+     */
     public ArrayList<Node> getShortestPathToNode(Node start, Node exit){
         Set<Node> potentialSteps = new HashSet<>();
         Set<Node> lastEntry = new HashSet<>();
@@ -94,6 +150,7 @@ public class ToolKit {
         stepMap.add(potentialSteps);
         scanned.addAll(potentialSteps);
 
+        // Scans all possible steps until the destination
         do {
             potentialSteps = new HashSet<>();
             lastEntry = getLastStep();
@@ -105,11 +162,13 @@ public class ToolKit {
         }while(!scanned.contains(exit));
 
 
-
+        // inverts the sequence of possible steps
         Collections.reverse(stepMap);
         Node nextStep = exit;
         finalPath.add(nextStep);
 
+        // goes backwards following the neighbours contained in the previous layer
+        // stores those steps in the final path
         for (int i = 1; i < stepMap.size()-1; i++){
             for(Node n : stepMap.get(i)){
                 if (nextStep.getNeighbours().contains(n)){
@@ -119,24 +178,29 @@ public class ToolKit {
             }
         }
 
+        // inverts the resulting final path and returns it.
         Collections.reverse(finalPath);
         return finalPath;
     }
 
+    /**
+     * Calculates the time remaining as percentage.
+     * @param startTime     The time before the first step was taken.
+     * @param currentTime   The current time.
+     * @return              The time remaining as a percentage.
+     */
     public int timeLeftPercentage (int startTime, int currentTime){
         int result = (currentTime * 100)/startTime;
         return result;
     }
 
-    public Node randomNode(Set<Node> pickOne){
-        /**
-        Random randomGenerator = new Random();
-        ArrayList<Node> nodePool = new ArrayList<>();
-        nodePool.addAll(pickOne);
-        int index = randomGenerator.nextInt(nodePool.size());
-        return nodePool.get(index);
-         */
-
+    /**
+     * Selects a node from a Set of Nodes (Not necessarily the first)
+     * (No longer used.)
+     * @param pickOne   Receives a set of nodes.
+     * @return          Returns the first node grabbed by the iterator.
+     */
+    public Node anyNode(Set<Node> pickOne){
         Node result = pickOne.iterator().next();
         for(Node n : pickOne){
             if (breadcrumCounter(n.getId()) <= breadcrumCounter(result.getId())) {
@@ -146,6 +210,11 @@ public class ToolKit {
         return result;
     }
 
+    /**
+     * Receives a Set of nodes and returns the tile containing the most gold.
+     * @param pickOne   receives a Set of nodes.
+     * @return          returns the tile with the most Gold.
+     */
     public Node getTileWithMostGold(Set<Node> pickOne){
         Node result = pickOne.iterator().next();
         for(Node n : pickOne){
@@ -156,11 +225,21 @@ public class ToolKit {
         return result;
     }
 
+    /**
+     * Empties all contents of the Breadcrum trail
+     */
+
     public void clearBreadcrumTrail(){
         breadcrumTrail.clear();
     }
 
-    public ArrayList<Node> getMostGoldNodes(Collection<Node> allNodes){
+    /**
+     *  Receives a Collection of Nodes and returns an arrayList containing the contents of the
+     *  collection sorted by amount of Gold (The highest amount first)
+     * @param allNodes  A collection of All Nodes
+     * @return          An ArrayList containing nodes Sorted by amount of Gold.
+     */
+    public ArrayList<Node> sortAllNodesByGold(Collection<Node> allNodes){
         ArrayList<Node> result = new ArrayList<Node>();
         result.addAll(allNodes);
 
@@ -175,21 +254,23 @@ public class ToolKit {
         return result;
     }
 
-    public Node nextClosestNodeWithGold(Node currentNode, ArrayList<Node> nodesWithGold){
+    /**
+     * Finds the closest node in respect of a given node, which contains any amount of Gold.
+     * @param currentNode       The reference node.
+     * @param nodesWithGold     An ArrayList of Nodes
+     * @return                  The closest node with gold to the reference node.
+     */
+    public Node nextClosestNodeWithGold(Node currentNode, ArrayList<Node> nodesWithGold) {
         Node result = nodesWithGold.get(0);
         int currentDistance = getShortestPathToNode(currentNode, result).size();
         int nextDistance;
-        for (Node n : nodesWithGold){
+        for (Node n : nodesWithGold) {
             nextDistance = getShortestPathToNode(currentNode, n).size();
-            if (n.getTile().getGold() > 0 && currentDistance > nextDistance){
+            if (n.getTile().getGold() > 0 && currentDistance > nextDistance) {
                 currentDistance = nextDistance;
                 result = n;
             }
         }
         return result;
-
     }
-
-
-
 }
